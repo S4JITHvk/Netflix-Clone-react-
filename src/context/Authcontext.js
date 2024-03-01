@@ -6,6 +6,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
+import {setDoc,doc} from 'firebase/firestore'
 
 const Authcontext=createContext()
 
@@ -13,8 +14,16 @@ export function Authcontextprovider({children}){
 
     const[user,setUser]=useState({})
 
-    function signUp(email,password){
-      return createUserWithEmailAndPassword(auth,email,password)
+    async function signUp(email, password) {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        const userDocRef = doc(db, 'users', email);
+        await setDoc(userDocRef, {
+          savedShows: []
+        });
+      } catch (error) {
+        console.error('Error during sign up:', error.message);
+      }
     }
     function logIn(email,password){
         return signInWithEmailAndPassword(auth,email,password)
@@ -22,8 +31,17 @@ export function Authcontextprovider({children}){
     function logOut(){
         return signOut(auth)
     }
+
+    useEffect(()=>{
+      const unsubscribe=onAuthStateChanged(auth,(currentUser)=>{
+        setUser(currentUser)
+      })
+      return ()=>{
+        unsubscribe()
+      }
+    })
     return (
-      <Authcontext.Provider value={{auth,user}}>
+      <Authcontext.Provider value={{auth,user,signUp,logIn,logOut}}>
         {children}
       </Authcontext.Provider>
     )
