@@ -31,8 +31,8 @@ const Movie = ({ item }) => {
   const handleMovie = async (id) => {
     try {
       const trailerResponse = await axios.get(
-        `http://api.themoviedb.org/3/movie/${id}/videos?api_key=8a481b67fc14f9b164fcf282ac1e84a9&language=en-US`
-      );
+        `http://api.themoviedb.org/3/movie/${id}/videos?api_key=de6aa365c3a8b8a53dc8204c32c1d18b&language=en-US`
+      )
       setTrailer(trailerResponse.data.results[0]);
       setIsModalOpen(true);
     } catch (error) {
@@ -40,10 +40,11 @@ const Movie = ({ item }) => {
     }
   };
 
-  const closeModal = () => {
+  const closeModal = (event) => {
+    event.stopPropagation();
     setIsModalOpen(false);
   };
-
+  
 
   return (
     <>
